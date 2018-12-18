@@ -10,3 +10,9 @@
   - Secrets
   - Job
   - Ingress
+- Debug
+  - Networks
+- Configs  
+  - kubeadm
+  - kubeconfig
+  - aduit
