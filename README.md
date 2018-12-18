@@ -16,3 +16,6 @@
   - kubeadm
   - kubeconfig
   - aduit
+
+#### Tools
+- [jq.md](https://github.com/wrasdf/cka/blob/master/tools/jq.md)
