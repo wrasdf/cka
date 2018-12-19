@@ -1,0 +1,54 @@
+Vagrant.require_version ">= 2.2.0"
+
+# Configuration
+SSH_PRIVATE_KEY="~/.ssh/id_vagrant_rsa"
+SSH_PUBLIC_KEY="~/.ssh/id_vagrant_rsa.pub"
+
+# use two digits id below, please
+nodes = [
+  { :hostname => 'master',  :ip => '10.240.0.20', :id => '10' },
+  { :hostname => 'node1',   :ip => '10.240.0.21', :id => '11' },
+  { :hostname => 'node2',   :ip => '10.240.0.22', :id => '12' },
+  { :hostname => 'node3',   :ip => '10.240.0.23', :id => '13' },
+]
+
+
+$script = <<SCRIPT
+echo
+
+echo "10.240.0.20 master
+10.240.0.21 node1
+10.240.0.22 node2
+10.240.0.23 node3
+" >> /etc/hosts
+
+yum -y update
+yum -y install gcc openssl-devel bzip2-devel libffi-devel
+yum -y install yum-utils
+yum -y groupinstall development
+yum -y install https://centos7.iuscommunity.org/ius-release.rpm
+yum -y install python36u
+yum -y install python36u-pip python36u-devel
+
+SCRIPT
+
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "centos/7"
+    config.vm.box_version = "1811.02"
+    config.ssh.insert_key = false
+    config.ssh.private_key_path = [SSH_PRIVATE_KEY, "~/.vagrant.d/insecure_private_key"]
+    config.vm.provision "file", source: SSH_PUBLIC_KEY, destination: "~/.ssh/authorized_keys"
+    nodes.each do |node|
+      config.vm.define node[:hostname] do |nodeconfig|
+        nodeconfig.vm.hostname = node[:hostname]
+        nodeconfig.vm.network "private_network", ip: node[:ip]
+        nodeconfig.vm.provider :virtualbox do |vb|
+          vb.name = node[:hostname]+".kube"
+          vb.memory = 2048
+          vb.cpus = 1
+        end
+        nodeconfig.vm.provision "shell", inline: $script
+      end
+    end
+end
