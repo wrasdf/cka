@@ -1,0 +1,16 @@
+[Unit]
+Description=Etcd server
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+EnvironmentFile=/opt/kubernetes/env
+ExecStart=/usr/bin/etcd-wrapper
+ExecStop=/usr/bin/docker stop etcd
+Restart=always
+RestartSec=30s
+LimitNOFILE=40000
+
+[Install]
+WantedBy=multi-user.target
