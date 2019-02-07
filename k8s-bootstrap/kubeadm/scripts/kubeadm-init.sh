@@ -14,14 +14,7 @@ kubeadm init \
   --skip-token-print \
   --ignore-preflight-errors=all
 
-# # hack incase other masters are running the kubectl applies as well
-# sleep $[ ( $RANDOM % 30 ) + 1 ]
-#
-# kubectl --kubeconfig=/etc/kubernetes/admin.conf \
-#   apply -f /etc/kubernetes/conf/canal-rbac.yaml
-# kubectl --kubeconfig=/etc/kubernetes/admin.conf \
-#   apply -f /etc/kubernetes/conf/canal-install.yaml
+# hack incase other masters are running the kubectl applies as well
+sleep $[ ( $RANDOM % 30 ) + 1 ]
 
-mkdir -p $HOME/.kube
-cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-chown $(id -u):$(id -g) $HOME/.kube/config
+kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /etc/kubernetes/conf/canal.yaml
