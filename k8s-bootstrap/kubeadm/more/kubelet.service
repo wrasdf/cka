@@ -1,0 +1,34 @@
+[Unit]
+Description=Kubernetes Kubelet Server
+After=docker.service
+Requires=docker.service
+
+[Service]
+EnvironmentFile=/opt/kubernetes/env
+ExecStartPre=/bin/sleep 15
+ExecStart=/usr/bin/kubelet \
+    --pod-manifest-path=/etc/kubernetes/manifests/ \
+    --kubeconfig /etc/kubernetes/kubelet.conf \
+    --register-node=true \
+    --container-runtime=docker \
+    --allow-privileged=true \
+    --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf \
+    --network-plugin=cni \
+    --cluster-dns=10.96.0.10 \
+    --cluster-domain=cluster.local \
+    --authorization-mode=Webhook \
+    --client-ca-file=/etc/kubernetes/pki/ca.crt \
+    --rotate-certificates=true \
+    --tls-cert-file=/etc/kubernetes/pki/kubelet/server.crt \
+    --tls-private-key-file=/etc/kubernetes/pki/kubelet/server.key \
+    --cert-dir=/var/lib/kubelet/pki \
+    --cadvisor-port=4194 \
+    --cgroup-driver=cgroupfs \
+    --cloud-provider=aws
+Restart=always
+RestartSec=3
+StartLimitInterval=0
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
